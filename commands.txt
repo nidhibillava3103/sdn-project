@@ -1,0 +1,59 @@
+# ================================
+# STATIC ROUTING USING SDN (MININET)
+# ================================
+
+# Step 1: Run custom topology
+sudo mn --custom static_topo.py --topo static --controller=none
+
+# Step 2: Check connectivity BEFORE installing rules
+pingall
+
+# ================================
+# Step 3: Install static flow rules
+# ================================
+
+# Switch s1
+sudo ovs-ofctl add-flow s1 in_port=1,actions=output:2
+sudo ovs-ofctl add-flow s1 in_port=2,actions=output:1
+
+# Switch s2
+sudo ovs-ofctl add-flow s2 in_port=1,actions=output:2
+sudo ovs-ofctl add-flow s2 in_port=2,actions=output:1
+
+# Switch s3
+sudo ovs-ofctl add-flow s3 in_port=1,actions=output:2
+sudo ovs-ofctl add-flow s3 in_port=2,actions=output:1
+
+# ================================
+# Step 4: Test connectivity AFTER rules
+# ================================
+pingall
+
+# ================================
+# Step 5: Regression testing (delete rules)
+# ================================
+sudo ovs-ofctl del-flows s1
+sudo ovs-ofctl del-flows s2
+sudo ovs-ofctl del-flows s3
+
+# Test again (should fail)
+pingall
+
+# ================================
+# Step 6: Reinstall rules
+# ================================
+
+# Switch s1
+sudo ovs-ofctl add-flow s1 in_port=1,actions=output:2
+sudo ovs-ofctl add-flow s1 in_port=2,actions=output:1
+
+# Switch s2
+sudo ovs-ofctl add-flow s2 in_port=1,actions=output:2
+sudo ovs-ofctl add-flow s2 in_port=2,actions=output:1
+
+# Switch s3
+sudo ovs-ofctl add-flow s3 in_port=1,actions=output:2
+sudo ovs-ofctl add-flow s3 in_port=2,actions=output:1
+
+# Final test (should succeed)
+pingall
